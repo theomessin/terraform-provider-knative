@@ -1,48 +1,35 @@
+# ⛰️ Terraform Knative Provider
+
 [![Tests](https://github.com/theomessin/terraform-provider-knative/actions/workflows/test.yml/badge.svg?branch=main&event=push)](https://github.com/theomessin/terraform-provider-knative/actions/workflows/test.yml)
 
-# Development Guide
+[Knative Serving](https://knative.dev/docs/serving/) builds on Kubernetes to support deploying and serving of applications and functions as serverless containers. This Terraform Provider lets you deploy and manage your Knative Services using Terraform.
+Maybe one day it'll support Knative Eventing, or even handle installing Knative for you.
 
-## Requirements
+## Getting Started
 
-- [Terraform](https://www.terraform.io/downloads.html) >= 1.0
-- [Go](https://golang.org/doc/install) >= 1.19
+Simply declare the provider as a requirement:
 
-## Building The Provider
+```tf
+terraform {
+  required_version = ">= 0.13"
 
-1. Clone the repository
-1. Enter the repository directory
-1. Build the provider using the Go `install` command:
-
-```shell
-go install
+  required_providers {
+    knative = {
+      source  = "theomessin/knative"
+      version = ">= 0.1.1"
+    }
+  }
+}
 ```
 
-## Adding Dependencies
+Now use the provider. For example, read the URL of an existing Service:
 
-This provider uses [Go modules](https://github.com/golang/go/wiki/Modules).
-Please see the Go documentation for the most up to date information about using Go modules.
+```tf
+data "knative_service" "this" {
+  name = "app"
+}
 
-To add a new dependency `github.com/author/dependency` to your Terraform provider:
-
-```shell
-go get github.com/author/dependency
-go mod tidy
-```
-
-Then commit the changes to `go.mod` and `go.sum`.
-
-## Developing the Provider
-
-If you wish to work on the provider, you'll first need [Go](http://www.golang.org) installed on your machine (see [Requirements](#requirements) above).
-
-To compile the provider, run `go install`. This will build the provider and put the provider binary in the `$GOPATH/bin` directory.
-
-To generate or update documentation, run `go generate`.
-
-In order to run the full suite of Acceptance tests, run `make testacc`.
-
-*Note:* Acceptance tests create real resources, and often cost money to run.
-
-```shell
-make testacc
+output "app" {
+  url = data.knative_service.this.status.url
+}
 ```
