@@ -1,4 +1,4 @@
-module github.com/hashicorp/terraform-provider-scaffolding-framework
+module github.com/theomessin/terraform-provider-knative
 
 go 1.19
 
