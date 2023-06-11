@@ -1,3 +1,3 @@
 provider "knative" {
-  # example configuration here
+  kube_config_path = "~/.kube/config"
 }

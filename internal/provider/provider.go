@@ -2,13 +2,16 @@ package provider
 
 import (
 	"context"
-	"net/http"
+	"os/user"
+	"path/filepath"
 
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/provider"
 	"github.com/hashicorp/terraform-plugin-framework/provider/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
-	"github.com/hashicorp/terraform-plugin-framework/types"
+
+	"k8s.io/client-go/tools/clientcmd"
+	client "knative.dev/serving/pkg/client/clientset/versioned/typed/serving/v1"
 )
 
 // Ensure KnativeProvider satisfies various provider interfaces.
@@ -24,7 +27,7 @@ type KnativeProvider struct {
 
 // KnativeProviderModel describes the provider data model.
 type KnativeProviderModel struct {
-	Endpoint types.String `tfsdk:"endpoint"`
+	//
 }
 
 func (p *KnativeProvider) Metadata(ctx context.Context, req provider.MetadataRequest, resp *provider.MetadataResponse) {
@@ -35,10 +38,7 @@ func (p *KnativeProvider) Metadata(ctx context.Context, req provider.MetadataReq
 func (p *KnativeProvider) Schema(ctx context.Context, req provider.SchemaRequest, resp *provider.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		Attributes: map[string]schema.Attribute{
-			"endpoint": schema.StringAttribute{
-				MarkdownDescription: "Example provider attribute",
-				Optional:            true,
-			},
+			//
 		},
 	}
 }
@@ -52,24 +52,23 @@ func (p *KnativeProvider) Configure(ctx context.Context, req provider.ConfigureR
 		return
 	}
 
-	// Configuration values are now available.
-	// if data.Endpoint.IsNull() { /* ... */ }
-
-	// Example client configuration for data sources and resources
-	client := http.DefaultClient
+	usr, _ := user.Current()
+	dir := usr.HomeDir
+	kubeconfigPath := filepath.Join(dir, ".kube", "config")
+	config, _ := clientcmd.BuildConfigFromFlags("", kubeconfigPath)
+	client, _ := client.NewForConfig(config)
 	resp.DataSourceData = client
-	resp.ResourceData = client
 }
 
 func (p *KnativeProvider) Resources(ctx context.Context) []func() resource.Resource {
 	return []func() resource.Resource{
-		NewExampleResource,
+		//
 	}
 }
 
 func (p *KnativeProvider) DataSources(ctx context.Context) []func() datasource.DataSource {
 	return []func() datasource.DataSource{
-		NewExampleDataSource,
+		NewServiceDataSource,
 	}
 }
 
