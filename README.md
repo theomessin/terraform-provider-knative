@@ -1,3 +1,5 @@
+[![Tests](https://github.com/theomessin/terraform-provider-knative/actions/workflows/test.yml/badge.svg?branch=main&event=push)](https://github.com/theomessin/terraform-provider-knative/actions/workflows/test.yml)
+
 # Development Guide
 
 ## Requirements
