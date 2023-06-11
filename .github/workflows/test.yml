@@ -76,20 +76,10 @@ jobs:
           terraform_wrapper: false
       - run: go mod download
       - name: Prepare a cluster
-        run: |
-          curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.19.0/kind-linux-amd64;
-          chmod +x ./kind;
-          mv ./kind /usr/local/bin/kind;
-          curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
-          chmod +x ./kubectl;
-          mv ./kubectl /usr/local/bin/kubectl;
-          wget https://github.com/knative/client/releases/download/knative-v1.10.0/kn-darwin-amd64
-          chmod +x ./kn-darwin-amd64
-          mv ./kn-darwin-amd64 /usr/local/bin/kn
-          curl -Lo ./quickstart https://github.com/knative-sandbox/kn-plugin-quickstart/releases/download/knative-v1.10.0/kn-quickstart-linux-amd64
-          chmod +x ./quickstart;
-          ./quickstart kind --install-serving;
-      - run: kn service create app --image ghcr.io/knative/helloworld-go
+        uses: container-tools/kind-action@v1
+        with:
+          knative_serving: v1.10.0
+          knative_kourier: v1.10.0
       - env:
           TF_ACC: "1"
         run: go test -v -cover ./internal/provider/
