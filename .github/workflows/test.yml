@@ -69,7 +69,8 @@ jobs:
       - env:
           TF_ACC: "1"
         run: |
-          kn service create app --image ghcr.io/knative/helloworld-go
+          kubectl create namespace example
+          kn service create app --namespace=example --image ghcr.io/knative/helloworld-go
           go test -v -cover ./internal/provider/
 
   generate:

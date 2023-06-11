@@ -25,6 +25,10 @@ data "knative_service" "this" {
 
 - `name` (String) The name of the Knative Service resource.
 
+### Optional
+
+- `namespace` (String) The namespace where the Knative Service resource is located. Defaults to `default`.
+
 ### Read-Only
 
 - `id` (String) The ID of the Knative Service resource. In the form of `namespace/name`.

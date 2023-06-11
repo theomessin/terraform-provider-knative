@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Ability to specify Kubernetes namespace for Service Data Source. This is optional and defaults to `default`.
+
 ## [0.1.1] - 2023-06-11
 
 ### Fixed

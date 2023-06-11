@@ -28,9 +28,10 @@ type ServiceDataSource struct {
 
 // ServiceDataSourceModel describes the data source data model.
 type ServiceDataSourceModel struct {
-	Name   types.String `tfsdk:"name"`
-	Status types.Object `tfsdk:"status"`
-	Id     types.String `tfsdk:"id"`
+	Namespace types.String `tfsdk:"namespace"`
+	Name      types.String `tfsdk:"name"`
+	Status    types.Object `tfsdk:"status"`
+	Id        types.String `tfsdk:"id"`
 }
 
 func (d *ServiceDataSource) Metadata(ctx context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
@@ -43,6 +44,10 @@ func (d *ServiceDataSource) Schema(ctx context.Context, req datasource.SchemaReq
 		MarkdownDescription: "Knative Service data source",
 
 		Attributes: map[string]schema.Attribute{
+			"namespace": schema.StringAttribute{
+				MarkdownDescription: "The namespace where the Knative Service resource is located. Defaults to `default`.",
+				Optional:            true,
+			},
 			"name": schema.StringAttribute{
 				MarkdownDescription: "The name of the Knative Service resource.",
 				Required:            true,
@@ -113,8 +118,14 @@ func (d *ServiceDataSource) Read(ctx context.Context, req datasource.ReadRequest
 		return
 	}
 
+	if data.Namespace.IsNull() {
+		data.Namespace = types.StringValue("default")
+	}
+
 	client := *d.client
-	service, err := client.Services("default").Get(ctx, data.Name.ValueString(), metav1.GetOptions{})
+	service, err := client.
+		Services(data.Namespace.ValueString()).
+		Get(ctx, data.Name.ValueString(), metav1.GetOptions{})
 
 	if err != nil {
 		resp.Diagnostics.AddError("Knative Client Error", err.Error())
@@ -142,7 +153,7 @@ func (d *ServiceDataSource) Read(ctx context.Context, req datasource.ReadRequest
 		"url":                          types.StringValue(service.Status.URL.String()),
 	})
 
-	data.Id = types.StringValue("default" + "/" + service.Name)
+	data.Id = types.StringValue(service.Namespace + "/" + service.Name)
 
 	// Write logs using the tflog package
 	// Documentation: https://terraform.io/plugin/log
