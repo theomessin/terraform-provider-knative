@@ -75,6 +75,17 @@ jobs:
           terraform_version: ${{ matrix.terraform }}
           terraform_wrapper: false
       - run: go mod download
+      - name: Prepare a cluster
+        run: |
+          curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.19.0/kind-linux-amd64;
+          chmod +x ./kind;
+          mv ./kind /usr/local/bin/kind;
+          curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+          chmod +x ./kubectl;
+          mv ./kubectl /usr/local/bin/kubectl;
+          curl -Lo ./quickstart https://github.com/knative-sandbox/kn-plugin-quickstart/releases/download/knative-v1.10.0/kn-quickstart-linux-amd64
+          chmod +x ./quickstart;
+          ./quickstart kind --install-serving;
       - env:
           TF_ACC: "1"
         run: go test -v -cover ./internal/provider/
